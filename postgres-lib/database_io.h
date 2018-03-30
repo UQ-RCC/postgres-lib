@@ -6,15 +6,7 @@
 #include <boost/thread.hpp>
 #include <nlohmann/json.hpp>
 #include <fmt/printf.h>
-
-struct ConnectParameters
-{
-	std::string host;
-	std::string port;
-	std::string instance;
-	std::string userName;
-	std::string password;
-};
+#include <postgres_lib.h>
 
 class MeshMakerDB
 {
