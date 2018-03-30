@@ -34,94 +34,6 @@ MeshMakerDB::~MeshMakerDB()
 	PQfinish(frameConn);
 }
 
-class SqlBuilder
-{
-	
-public:
-
-	SqlBuilder(const std::string& function) : function(function) {}
-
-	SqlBuilder& operator<<(const std::string & param)
-	{	
-		length.push_back(param.length());
-		format.push_back(0);
-		parameter.push_back(param.c_str());
-		parameterDef.push_back(std::string().append("$").append(std::to_string(parameter.size())));
-		return *this;
-	}
-
-	SqlBuilder& operator<<(const int param)
-	{		
-		length.push_back(sizeof(int));
-		format.push_back(1);
-		intKeeper.push_back(htonl(param));
-		parameter.push_back((char *) &intKeeper.back());
-		parameterDef.push_back(std::string().append("$").append(std::to_string(parameter.size())).append("::integer"));
-		return *this;
-	}
-
-	std::string getSQL()
-	{		
-		std::string sql = "select * from ";
-		sql.append(function).append("(");
-		for (int i = 0; i < NumParameters() - 1; i++)
-		{
-			sql.append(parameterDef[i]);
-			sql.append(", ");
-		}
-		if (NumParameters() > 0)
-		{
-			sql.append(parameterDef[NumParameters() - 1]);
-		}
-		sql.append(")");
-		return sql;
-	}
-
-	int * GetParamLength()
-	{
-		return NumParameters() ? length.data() : NULL;		
-	}
-
-	int * GetParamFormat()
-	{
-		return NumParameters() ? format.data() : NULL;
-	}
-
-	const char ** getParameter()
-	{
-		return NumParameters() ? parameter.data() : NULL;
-	}
-
-	int NumParameters()
-	{
-		return parameter.size();
-	}
-
-	PGresult * execute(PGconn * meshConn)
-	{
-		return PQexecParams(meshConn, getSQL().c_str(), NumParameters(), NULL, getParameter(), GetParamLength(), GetParamFormat(), 0);
-	}
-
-	//This is how doubles are done (for future ref)	
-	void to_nbo(const double in, double * out)
-	{
-		uint64_t * i = (uint64_t *)&in;
-		uint32_t * r = (uint32_t *)out;
-
-		/* convert input to network byte order */
-		r[0] = htonl((uint32_t)((*i) >> 32));
-		r[1] = htonl((uint32_t)*i);
-	}
-
-private:
-	std::string function;
-	std::vector<int> length;
-	std::vector<int> format;
-	std::vector<const char *> parameter;
-	std::vector<std::string> parameterDef;
-	std::deque<int> intKeeper;
-};
-
 /*
 int MeshMakerDB::InsertMesh(const Mesh mesh)
 {
@@ -139,7 +51,7 @@ int MeshMakerDB::InsertMesh(const Mesh mesh)
 }
 */
 
-void MeshMakerDB::TestConnection()
+void MeshMakerDB::test_connection()
 {
 	boost::lock_guard<boost::mutex> lock(meshConnMtx);
 	fmt::print("testing");
@@ -156,6 +68,25 @@ void MeshMakerDB::TestConnection()
 		}
 	}
 	PQclear(testRS);
+}
+
+void MeshMakerDB::execute_sqb(SqlBuilder & sqb)
+{
+	
+	PGresult * testRS = sqb.execute(meshConn);
+	if (checkStmt(testRS, meshConn))
+	{
+		if (!PQgetisnull(testRS, 0, 0))
+		{
+			fmt::print("id = {}\n", PQgetvalue(testRS, 0, 0));
+		}
+		else
+		{
+			fmt::print("no results\n");
+		}
+	}
+	PQclear(testRS);
+
 }
 
 int MeshMakerDB::StartLog()
