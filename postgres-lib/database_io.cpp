@@ -1,6 +1,6 @@
 #include "database_io.h"
 
-MeshMakerDB::MeshMakerDB(ConnectParameters params)
+MeshMakerDB::MeshMakerDB(const ConnectParameters & params)
 {
 	
 	meshConn = PQsetdbLogin(
@@ -34,23 +34,6 @@ MeshMakerDB::~MeshMakerDB()
 	PQfinish(frameConn);
 }
 
-/*
-int MeshMakerDB::InsertMesh(const Mesh mesh)
-{
-	boost::lock_guard<boost::mutex> lock(meshConnMtx);
-	cout << "inserting mesh" << mesh.frameId << endl;
-	SqlBuilder sqb("insert_gl_frame");
-	sqb << mesh.frameId << mesh.objectCount << mesh.cellCount << mesh.status;	
-	PGresult * meshRS = sqb.execute(meshConn);
-	if (!checkStmt(meshRS, meshConn))
-	{
-		printf("Insert mesh failed with code %s\n", mesh.processCode.c_str());
-	}
-	PQclear(meshRS);	
-	return mesh.frameId;
-}
-*/
-
 void MeshMakerDB::test_connection()
 {
 	boost::lock_guard<boost::mutex> lock(meshConnMtx);
@@ -70,19 +53,18 @@ void MeshMakerDB::test_connection()
 	PQclear(testRS);
 }
 
-void MeshMakerDB::execute_sqb(SqlBuilder & sqb)
-{
-	
-	PGresult * testRS = sqb.execute(meshConn);
+int MeshMakerDB::execute_sqb(SqlBuilder & sqb)
+{	
+	PGresult * testRS = PQexecParams(meshConn, sqb.getSQL().c_str(), sqb.NumParameters(), NULL, sqb.GetParameter(), sqb.GetParamLength(), sqb.GetParamFormat(), 0);
 	if (checkStmt(testRS, meshConn))
 	{
 		if (!PQgetisnull(testRS, 0, 0))
 		{
-			fmt::print("id = {}\n", PQgetvalue(testRS, 0, 0));
+			return (int) PQgetvalue(testRS, 0, 0);
 		}
 		else
 		{
-			fmt::print("no results\n");
+			return -1;
 		}
 	}
 	PQclear(testRS);
@@ -93,7 +75,7 @@ int MeshMakerDB::StartLog()
 {
 	SqlBuilder sqb("start_log");
 	boost::unique_lock<boost::mutex> lock(meshConnMtx);	
-	PGresult * logRS = sqb.execute(meshConn);
+	PGresult * logRS = PQexecParams(meshConn, sqb.getSQL().c_str(), sqb.NumParameters(), NULL, sqb.GetParameter(), sqb.GetParamLength(), sqb.GetParamFormat(), 0);
 	if (checkStmt(logRS, meshConn))
 	{
 		if (!PQgetisnull(logRS, 0, 0))
@@ -113,7 +95,7 @@ void MeshMakerDB::EndLog(int logID, const std::string & type, int foreignID, con
 	SqlBuilder sqb("end_log");
 	sqb << logID << type << foreignID << message;	
 	boost::unique_lock<boost::mutex> lock(meshConnMtx);
-	PGresult * logRS = sqb.execute(meshConn);
+	PGresult * logRS = PQexecParams(meshConn, sqb.getSQL().c_str(), sqb.NumParameters(), NULL, sqb.GetParameter(), sqb.GetParamLength(), sqb.GetParamFormat(), 0);
 	if (!checkStmt(logRS, meshConn))
 	{
 		printf("insert into end log failed\n");
@@ -134,4 +116,10 @@ bool MeshMakerDB::checkStmt(PGresult * result, PGconn * conn)
 		return false;
 	}
 	return true;
+}
+
+int MeshMakerDB::execute()
+{
+	fmt::print("from derived class...\n");
+	return 0;
 }

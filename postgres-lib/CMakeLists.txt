@@ -25,7 +25,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(PostgreSQL MODULE REQUIRED)
 
-add_library (postgreslib "postgres_lib.cpp" "postgres_lib.h" "database_io.cpp" "database_io.h")
+add_library (postgreslib "database_lib.cpp" "database_lib.h" "database_io.cpp" "database_io.h")
 target_include_directories (postgreslib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(postgreslib ${PostgreSQL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
