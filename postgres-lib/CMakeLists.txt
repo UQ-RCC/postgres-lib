@@ -4,9 +4,7 @@
 if(WIN32)	
 	set(BOOST_ROOT "D:/boost_1_66_0")
 	set(BOOST_LIB_SUFFIX "-vc141-mt-x64-1_66.lib")
-else()
-	set(PostgreSQL_INCLUDE_DIR "/home/uqocairn/usr/local/pgsql/include")
-	set(PostgreSQL_LIBRARY_DIR "/home/uqocairn/usr/local/pgsql/lib")
+else()	
 	set(BOOST_ROOT "/groups/RCC/uqocairn/boost_1_66_0")
 	set(BOOST_LIB_SUFFIX "-gcc71-mt-x64-1_66.a")	
 endif()
@@ -26,7 +24,14 @@ endforeach(lib)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
-find_package(PostgreSQL MODULE REQUIRED)
+
+# Hack to find postgres
+if (WIN32)
+	find_package(PostgreSQL MODULE REQUIRED)
+else()
+	set(PostgreSQL_INCLUDE_DIRS "/home/uqocairn/usr/local/pgsql/include")
+	file(GLOB PostgreSQL_LIBRARIES "/home/uqocairn/usr/local/pgsql/lib/*.a")
+endif()
 
 add_library (postgreslib "database_lib.cpp" "database_lib.h" "database_io.cpp" "database_io.h")
 target_include_directories (postgreslib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
