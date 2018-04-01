@@ -13,8 +13,8 @@ endif()
 
 # Hack to locate boost libs. Find_boost will not locate libs given filenames are a complete mess.
 # This is site specific and probably will not work anywhere else (of course).
+# set(Boost_DEBUG ON)
 set(BOOST_OPTIONS thread system date_time regex chrono)
-set(Boost_DEBUG ON)
 set(Boost_USE_STATIC_LISB ON)
 set(Boost_NO_SYSTEM_PATHS ON)
 set(BOOST_LIB_PREFIX "libboost_")
