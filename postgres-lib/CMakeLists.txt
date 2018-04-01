@@ -25,7 +25,7 @@ endforeach(lib)
 find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-# Hack to find postgres
+# Hack to find postgres 
 if (WIN32)
 	find_package(PostgreSQL MODULE REQUIRED)
 else()
