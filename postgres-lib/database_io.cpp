@@ -60,7 +60,7 @@ int MeshMakerDB::execute_sqb(SqlBuilder & sqb)
 	{
 		if (!PQgetisnull(testRS, 0, 0))
 		{
-			return (int) PQgetvalue(testRS, 0, 0);
+			return atoi(PQgetvalue(testRS, 0, 0));
 		}
 		else
 		{
