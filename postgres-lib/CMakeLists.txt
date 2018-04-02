@@ -38,13 +38,17 @@ target_include_directories (postgreslib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(postgreslib ${PostgreSQL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 target_link_libraries(postgreslib ${PostgreSQL_LIBRARIES} ${BOOST_LIBS})
-
 target_link_libraries(postgreslib fmt::fmt nlohmann_json)
 
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY CACHE_VARIABLES)
-foreach(dir ${dirs})
-  message(STATUS "property '${dir} : ${${dir}}'")
-endforeach()
+if(UNIX)
+	target_link_libraries(postgreslib pthread)
+endif()
+
+# Print environment
+# get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY CACHE_VARIABLES)
+# foreach(dir ${dirs})
+#   message(STATUS "property '${dir} : ${${dir}}'")
+# endforeach()
 
 
 
