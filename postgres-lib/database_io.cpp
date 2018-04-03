@@ -55,52 +55,17 @@ void MeshMakerDB::test_connection()
 
 int MeshMakerDB::execute_sqb(SqlBuilder & sqb)
 {	
-	PGresult * testRS = PQexecParams(meshConn, sqb.getSQL().c_str(), sqb.NumParameters(), NULL, sqb.GetParameter(), sqb.GetParamLength(), sqb.GetParamFormat(), 0);
+	int returnValue = -1;
+	PGresult * testRS = PQexecParams(meshConn, sqb.getSQL().c_str(), sqb.NumParameters(), NULL, sqb.GetParameter(), (int *) sqb.GetParamLength(), sqb.GetParamFormat(), 0);
 	if (checkStmt(testRS, meshConn))
 	{
 		if (!PQgetisnull(testRS, 0, 0))
 		{
-			return atoi(PQgetvalue(testRS, 0, 0));
-		}
-		else
-		{
-			return -1;
-		}
+			returnValue = atoi(PQgetvalue(testRS, 0, 0));
+		}		
 	}
 	PQclear(testRS);
-
-}
-
-int MeshMakerDB::StartLog()
-{
-	SqlBuilder sqb("start_log");
-	boost::unique_lock<boost::mutex> lock(meshConnMtx);	
-	PGresult * logRS = PQexecParams(meshConn, sqb.getSQL().c_str(), sqb.NumParameters(), NULL, sqb.GetParameter(), sqb.GetParamLength(), sqb.GetParamFormat(), 0);
-	if (checkStmt(logRS, meshConn))
-	{
-		if (!PQgetisnull(logRS, 0, 0))
-		{
-			return atoi(PQgetvalue(logRS, 0, 0));
-		}
-	}
-	else
-	{
-		return 0;
-	}
-	PQclear(logRS);
-}
-
-void MeshMakerDB::EndLog(int logID, const std::string & type, int foreignID, const std::string & message)
-{
-	SqlBuilder sqb("end_log");
-	sqb << logID << type << foreignID << message;	
-	boost::unique_lock<boost::mutex> lock(meshConnMtx);
-	PGresult * logRS = PQexecParams(meshConn, sqb.getSQL().c_str(), sqb.NumParameters(), NULL, sqb.GetParameter(), sqb.GetParamLength(), sqb.GetParamFormat(), 0);
-	if (!checkStmt(logRS, meshConn))
-	{
-		printf("insert into end log failed\n");
-	}
-	PQclear(logRS);	
+	return returnValue;
 }
 
 bool MeshMakerDB::checkStmt(PGresult * result, PGconn * conn)

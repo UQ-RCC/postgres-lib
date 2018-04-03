@@ -16,7 +16,7 @@ public:
 	~DBExecutorImpl() {};
 	int execute_procedure(SqlBuilder & sqb)
 	{
-		return db.execute_sqb(sqb);		
+		return db.execute_sqb(sqb);
 	}
 
 private:

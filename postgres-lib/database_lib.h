@@ -3,8 +3,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
-#include <vector>
-#include <deque>
+#include "sql_builder.h"
 
 struct ConnectParameters
 {
@@ -16,7 +15,7 @@ struct ConnectParameters
 };
 
 void testDB(const ConnectParameters & cp);
-
+/*
 class SqlBuilder
 {
 
@@ -97,7 +96,7 @@ public:
 		uint64_t * i = (uint64_t *)&in;
 		uint32_t * r = (uint32_t *)out;
 
-		/* convert input to network byte order */
+		// convert input to network byte order
 		r[0] = mhtonl((uint32_t)((*i) >> 32));
 		r[1] = mhtonl((uint32_t)*i);
 	}
@@ -125,6 +124,7 @@ private:
 	}
 
 };
+*/
 
 class DBExecutor
 {

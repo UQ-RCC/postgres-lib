@@ -14,6 +14,10 @@ int main()
 	DBExecutor executor(cp);
 	auto id = executor.execute_procedure("q_log", "test from outside", "{}");
 	std::cout << "query retured: " << id << std::endl;
+
+	id = executor.execute_procedure("version");
+	std::cout << "query retured: " << id << std::endl;
+
 	std::cin.get();
 	return 0;
 }
