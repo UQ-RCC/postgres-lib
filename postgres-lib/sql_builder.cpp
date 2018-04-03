@@ -1,4 +1,3 @@
-#pragma once
 #include "sql_builder.h"
 #include <string>
 #include <iostream>
