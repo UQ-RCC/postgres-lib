@@ -1,7 +1,4 @@
 #include "sql_builder.h"
-#include <string>
-#include <iostream>
-#include <fmt/printf.h>
 
 SqlBuilder::SqlBuilder(const std::string & function) : function(function) {}
 

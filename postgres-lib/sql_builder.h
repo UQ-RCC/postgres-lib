@@ -2,6 +2,9 @@
 
 #include <vector>
 #include <deque>
+#include <string>
+#include <iostream>
+#include <fmt/printf.h>
 
 class SqlBuilder
 {
