@@ -35,15 +35,10 @@ SqlBuilder& SqlBuilder::operator<<(const double param)
 
 std::string SqlBuilder::getSQL()
 {
-	
-	fmt::print("building function {} with {} parameters\n", function, NumParameters());
-	std::cin.get();
 	std::string sql = "select * from ";
 	sql.append(function).append("(");
 	for (int i = 0; i < (NumParameters() - 1); i++)
-	{
-		size_t nP = NumParameters() - 1;
-		fmt::print("size_t stuff up? {}\n", nP);
+	{	
 		std::cin.get();
 		sql.append(parameterDef[i]);
 		sql.append(", ");
@@ -52,8 +47,7 @@ std::string SqlBuilder::getSQL()
 	{
 		sql.append(parameterDef[NumParameters() - 1]);
 	}
-	sql.append(")");
-	std::cout << "building... " << sql << std::endl;
+	sql.append(")");	
 	return sql;
 }
 
@@ -87,7 +81,16 @@ void SqlBuilder::to_nbo(const double in, double * out)
 	//r[1] = mhtonl((uint32_t)*i);
 }
 
+
+
 int SqlBuilder::mhtonl(int p)
 {
 	return p;
+}
+
+int htonl(const uint32_t net)
+{
+	uint8_t data[4] = {};
+	memcpy(&data, &net, sizeof(data));
+
 }

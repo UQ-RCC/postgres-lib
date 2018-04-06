@@ -4,7 +4,7 @@
 #include <deque>
 #include <string>
 #include <iostream>
-#include <fmt/printf.h>
+#include <stdint.h>
 
 class SqlBuilder
 {
